@@ -1,6 +1,5 @@
 package com.example.test;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -17,6 +16,8 @@ public class SeeFoodActivity extends AppCompatActivity {
 
     private ActivitySeeFoodBinding binding;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,11 +27,12 @@ public class SeeFoodActivity extends AppCompatActivity {
         initview();
     }
 
-    @SuppressLint("SetTextI18n")
     private void initview() {
         int id = getIntent().getIntExtra("id", 0);
         new Thread(() -> {
             Food updatefoodinfo = AppDataBase.getInstance(this).foodDao().getFoodid(id);
+            long test = Long.parseLong(updatefoodinfo.getDatetime());
+            String good = convertMillisToString(test);
             runOnUiThread(() -> {
                 byte[] image = updatefoodinfo.getImageuri();
                 Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
@@ -41,7 +43,7 @@ public class SeeFoodActivity extends AppCompatActivity {
                 binding.seeFoodPrice.setText(updatefoodinfo.getPrice() + "원");
                 binding.seeFoodTypeMeal.setText(updatefoodinfo.getTypemeal());
                 binding.seeFoodName.setText(updatefoodinfo.getFoodname());
-                binding.seedateText.setText(updatefoodinfo.getDate());
+                binding.seedateText.setText(good);
             });
         }).start();
     }
