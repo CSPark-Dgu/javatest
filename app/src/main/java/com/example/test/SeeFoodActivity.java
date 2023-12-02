@@ -1,5 +1,6 @@
 package com.example.test;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ public class SeeFoodActivity extends AppCompatActivity {
         initview();
     }
 
+    @SuppressLint("SetTextI18n")
     private void initview() {
         int id = getIntent().getIntExtra("id", 0);
         new Thread(() -> {

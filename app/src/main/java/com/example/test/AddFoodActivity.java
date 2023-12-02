@@ -32,7 +32,7 @@ import androidx.core.content.ContextCompat;
 import com.example.test.databinding.ActivityAddFoodBinding;
 import com.google.android.material.chip.Chip;
 
-import java.nio.ByteBuffer;
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -51,6 +51,15 @@ public class AddFoodActivity extends AppCompatActivity {
     private byte[] bytemap;
 
     private MyObserver observer;
+    public interface OnDataInsertListener {
+        void onDataInserted();
+    }
+
+    private OnDataInsertListener onDataInsertListener;
+    public void setOnDataInsertListener(OnDataInsertListener listener) {
+        this.onDataInsertListener = listener;
+    }
+
 
     private final ActivityResultLauncher<Intent> filterActivityLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -63,7 +72,11 @@ public class AddFoodActivity extends AppCompatActivity {
                                     MediaStore.Images.Media.getBitmap(this.getContentResolver(), photouri) :
                                     ImageDecoder.decodeBitmap(ImageDecoder.createSource(this.getContentResolver(), photouri));
 
-                            bytemap = convertBitmapToByteArray(bitmap);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                binding.foodImageView.setImageBitmap(ImageDecoder.decodeBitmap(ImageDecoder.createSource(this.getContentResolver(), photouri)));
+                            }
+                            ;
+                            bytemap = new BitmapUtils().toByteArray(bitmap);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -325,22 +338,28 @@ public class AddFoodActivity extends AppCompatActivity {
         int cal = (50 + (int) (Math.random() * 100));
         int id = (int) (Math.random() * 100000);
 
-        Food food = new Food(address, typemeal, uploaddate, uploaddatetime, month, foodname, bytemap, review, price, cal,id);
+        Food food = new Food(address, typemeal, uploaddate, uploaddatetime, month, foodname, bytemap, review, price, cal, id);
 
-        new Thread(()->{
+        new Thread(() -> {
             AppDataBase.getInstance(AddFoodActivity.this).foodDao().insert(food);
-            runOnUiThread(() -> Toast.makeText(getApplicationContext(), "저장 완료", Toast.LENGTH_SHORT).show());
-            Intent intent = new Intent().putExtra("Updated", true);
-            Log.d(TAG, month);
-            setResult(RESULT_OK, intent);
-            finish();
-        });
+            runOnUiThread(() -> {
+                Toast.makeText(getApplicationContext(), "저장 완료", Toast.LENGTH_SHORT).show();
+                if (onDataInsertListener != null) {
+                    onDataInsertListener.onDataInserted();
+                }
+                Intent intent = new Intent().putExtra("Updated", true);
+                Log.d(TAG, month);
+                setResult(RESULT_OK, intent);
+                finish();
+            });
+        }).start();
     }
 
-    private byte[] convertBitmapToByteArray(Bitmap bitmap) {
-        int size = bitmap.getRowBytes() * bitmap.getHeight();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(size);
-        bitmap.copyPixelsToBuffer(byteBuffer);
-        return byteBuffer.array();
+        public class BitmapUtils {
+        public byte[] toByteArray(Bitmap bitmap) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            return stream.toByteArray();
+        }
     }
 }

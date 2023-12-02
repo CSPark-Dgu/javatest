@@ -1,11 +1,9 @@
 package com.example.test.Adapter;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -19,12 +17,10 @@ import java.util.List;
 
 public class FoodInfoAdapter extends RecyclerView.Adapter<FoodInfoAdapter.FoodInfoViewHolder> {
 
-    private final Context context;
-    private final fooditemclick listener;
     private final List<Food> list;
+    private final fooditemclick listener;
 
-    public FoodInfoAdapter(Context context, List<Food> list, fooditemclick listener) {
-        this.context = context;
+    public FoodInfoAdapter(List<Food> list, fooditemclick listener) {
         this.list = list;
         this.listener = listener;
     }
@@ -35,7 +31,7 @@ public class FoodInfoAdapter extends RecyclerView.Adapter<FoodInfoAdapter.FoodIn
         notifyDataSetChanged();
     }
 
-    public class FoodInfoViewHolder extends RecyclerView.ViewHolder {
+    public static class FoodInfoViewHolder extends RecyclerView.ViewHolder {
 
         private final ItemfoodinfoBinding binding;
 
@@ -48,7 +44,7 @@ public class FoodInfoAdapter extends RecyclerView.Adapter<FoodInfoAdapter.FoodIn
     @NonNull
     @Override
     public FoodInfoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ItemfoodinfoBinding binding = ItemfoodinfoBinding.inflate(inflater, parent, false);
         return new FoodInfoViewHolder(binding);
     }
@@ -58,20 +54,19 @@ public class FoodInfoAdapter extends RecyclerView.Adapter<FoodInfoAdapter.FoodIn
     public void onBindViewHolder(@NonNull FoodInfoViewHolder holder, int position) {
         Food food = list.get(position);
         ItemfoodinfoBinding binding = holder.binding;
+
+        // Decode byte array to Bitmap
         byte[] image = food.getImageuri();
         Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
 
+        // Set data to UI components
         binding.recyclerviewtypeMeal.setText(food.getTypemeal());
         binding.recyclerviewfoodName.setText(food.getFoodname());
         binding.recyclerviewKcal.setText(food.getCal() + " Kcal");
         binding.recyclerviewfoodImage.setImageBitmap(bitmap);
 
-        binding.worditem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.onClick(food);
-            }
-        });
+        // Set click listener
+        binding.worditem.setOnClickListener(view -> listener.onClick(food));
     }
 
     @Override

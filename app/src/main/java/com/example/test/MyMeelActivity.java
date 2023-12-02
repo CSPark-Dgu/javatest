@@ -16,25 +16,28 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.test.Adapter.FoodInfoAdapter;
-import com.example.test.databinding.ActivityMyMeelBinding;
 import com.example.test.Adapter.FoodInfoAdapter.fooditemclick;
+import com.example.test.databinding.ActivityMyMeelBinding;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 public class MyMeelActivity extends AppCompatActivity implements fooditemclick {
 
     private static final String TAG = "MyMeelActivity";
     private ActivityMyMeelBinding binding;
-    private FoodInfoAdapter foodAdapter;
+
     private Long loadtime = null;
+    private FoodInfoAdapter foodAdapter;
     private final Set<CalendarDay> selectedDates = new HashSet<>();
     private final ActivityResultLauncher<Intent> UpdatedFood = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -84,9 +87,11 @@ public class MyMeelActivity extends AppCompatActivity implements fooditemclick {
     }
 
     private void initView() {
+        foodAdapter = new FoodInfoAdapter(new ArrayList<>(), this); // Pass an empty list initially
         binding.myMealRecyclerView.setAdapter(foodAdapter);
         binding.myMealRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
     }
+
 
     private void updateFoodInfo() {
         if (loadtime != null) {
@@ -150,7 +155,7 @@ public class MyMeelActivity extends AppCompatActivity implements fooditemclick {
 
         @Override
         public void decorate(DayViewFacade view) {
-            view.setSelectionDrawable(ContextCompat.getDrawable(context, R.drawable.customday));
+            view.setSelectionDrawable(Objects.requireNonNull(ContextCompat.getDrawable(context, R.drawable.customday)));
             view.addSpan(new RelativeSizeSpan(1.4f));
             view.addSpan(new StyleSpan(Typeface.BOLD));
             view.addSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.startColor)));

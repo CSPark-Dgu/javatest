@@ -11,16 +11,16 @@ import java.io.ByteArrayOutputStream;
 @Entity(tableName = "foodinfo")
 public class Food {
 
-    private String address;
-    private String typemeal;
-    private String date;
-    private String datetime;
-    private String datemonth;
-    private String foodname;
-    private byte[] imageuri;
-    private String review;
-    private int price;
-    private int cal;
+    private final String address;
+    private final String typemeal;
+    private final String date;
+    private final String datetime;
+    private final String datemonth;
+    private final String foodname;
+    private final byte[] imageuri;
+    private final String review;
+    private final int price;
+    private final int cal;
 
     @PrimaryKey(autoGenerate = true)
     private int id;
